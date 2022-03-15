@@ -1,0 +1,37 @@
+name: GLaDOS_daily_signin
+     
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: "32 0 * * *"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install requirements
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: SignIn
+      run: |
+        sudo cp -p ./chromedriver /usr/bin
+        chmod -R 777 /usr/bin/chromedriver
+        python ./GLaDOS_signin.py
+      env:
+        STUID: ${{ secrets.STUID }}
+        PW: ${{ secrets.PW }}
+        SERVER: ${{ secrets.SERVER }}
+        SCKEY: ${{ secrets.SCKEY }}
+        MAIL_NOTICE: ${{ secrets.MAI_NOTICE }}
+        MAILBOX: ${{ secrets.MAILBOX }}
